@@ -45,7 +45,7 @@ namespace Tetris
             this.panelTetrisBoard.Name = "panelTetrisBoard";
             this.panelTetrisBoard.Size = new System.Drawing.Size(320, 440);
             this.panelTetrisBoard.TabIndex = 0;
-            this.panelTetrisBoard.Paint += new System.Windows.Forms.PaintEventHandler(this.panelTetrisBoard_Paint);
+            this.panelTetrisBoard.Paint += new System.Windows.Forms.PaintEventHandler(this.PanelTetrisBoard_Paint);
             // 
             // buttonStartGame
             // 
@@ -58,7 +58,7 @@ namespace Tetris
             this.buttonStartGame.TabStop = false;
             this.buttonStartGame.Text = "Start Game";
             this.buttonStartGame.UseVisualStyleBackColor = true;
-            this.buttonStartGame.Click += new System.EventHandler(this.buttonStartGame_Click);
+            this.buttonStartGame.Click += new System.EventHandler(this.ButtonStartGame_Click);
             
             //Usunięcie flickeringu
             typeof(Panel).InvokeMember("DoubleBuffered",

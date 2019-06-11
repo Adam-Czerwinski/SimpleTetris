@@ -16,5 +16,6 @@ namespace Tetris
         event Action LeftArrow;
         event Action RightArrow;
         event Action DownArrow;
+        event Action Spacebar;
     }
 }

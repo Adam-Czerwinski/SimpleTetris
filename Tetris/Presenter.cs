@@ -19,6 +19,7 @@ namespace Tetris
             //Przypisanie strzałek (A,D) do metod znajdujących się w silniku gry
             _view.LeftArrow += _gameEngine.MoveLeft;
             _view.RightArrow += _gameEngine.MoveRight;
+            _view.Spacebar += _gameEngine.FallDown;
 
             //Timer elapsed to kolejny ruch co upływ czasu, więc po prostu spadek w dół
             _view.DownArrow += _gameEngine.Timer_Elapsed;
@@ -84,8 +85,8 @@ namespace Tetris
         private void StopEngine()
         {
             _gameEngine.Stop();
-            _view.StartButtonVisibility(true);
             _view.ShowMessage("Koniec gry! Twój wynik to " + _gameEngine.Player.Score.ToString());
+            _view.StartButtonVisibility(true);
         }
 
     }

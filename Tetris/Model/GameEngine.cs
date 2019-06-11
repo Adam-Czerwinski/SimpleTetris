@@ -50,6 +50,58 @@ namespace Tetris.Model
         }
 
         /// <summary>
+        /// Nagłe opadniecie w dół jak najdalej może
+        /// </summary>
+        public void FallDown()
+        {
+            //Zapobiega to rozpoczęciu gry w jakiś dziwny sposób
+            //jeżeli nie jest w grze to nic nie rób
+            if (State == GameState.NOT_PLAYING)
+                return;
+
+            int[][] newPosition = new int[4][];
+
+            //Głęboka kopia. Przepisz aktualną pozycję tetromino do nowych pozycji
+            for (int i = 0; i < Player.Tetromino.Position.GetLength(0); i++)
+            {
+                newPosition[i] = new int[2];
+                for (int j = 0; j < 2; j++)
+                    newPosition[i][j] = Player.Tetromino.Position[i][j];
+            }
+
+            //ile kratek w dół może opaść
+            int ile = 0;
+
+            //Wykonuj cały czas dopóki nie będzie mógł znaleźć nowej pozycji
+            while (true)
+            {
+                for (int i = 0; i < Player.Tetromino.Position.GetLength(0); i++)
+                {
+                    int x = newPosition[i][0] + 1;
+                    int y = newPosition[i][1];
+                    newPosition[i] = new int[] { x, y };
+                }
+
+                //Jeżeli znajdziesz pozycję w której nie może się znaleźć to przerwij pętlę
+                if (!CanMoveDown(newPosition))
+                {
+                    //Zmniejsz o jedną kratkę, ponieważ na górze aktualizowaliśmy odrazu newPosition
+                    for (int i = 0; i < Player.Tetromino.Position.GetLength(0); i++)
+                        newPosition[i][0] -= 1;
+
+                    break;
+                }
+
+                //w przeciwnym wypadku zwiększ o ile może ruszyć się
+                ile++;
+            }
+
+            //Jeżeli może spaść chociaż o jedną pozycję w dól to spadnij
+            if (ile > 0)
+                UpdateTetrisBoard(newPosition);
+        }
+
+        /// <summary>
         /// Spadanie w dół
         /// </summary>
         private void MoveDown()
@@ -412,5 +464,6 @@ namespace Tetris.Model
             //ustawienie pozycji początkowej Tetromino
             SetTetrominoPosition(Player.Tetromino);
         }
+
     }
 }

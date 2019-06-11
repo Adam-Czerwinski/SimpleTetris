@@ -17,7 +17,8 @@ namespace Tetris
         public event Action LeftArrow;
         public event Action RightArrow;
         public event Action DownArrow;
-        
+        public event Action Spacebar;
+
         /// <summary>
         /// Tablica odzwierciedlająca grę
         /// </summary>
@@ -27,7 +28,7 @@ namespace Tetris
         /// <summary>
         /// Kliknięcie przycisku start
         /// </summary>
-        private void buttonStartGame_Click(object sender, EventArgs e)
+        private void ButtonStartGame_Click(object sender, EventArgs e)
         {
             StartGame();
         }
@@ -38,17 +39,13 @@ namespace Tetris
         private void Form_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.A)
-            {
                 LeftArrow();
-            }
             else if (e.KeyCode == Keys.D)
-            {
                 RightArrow();
-            }
             else if (e.KeyCode == Keys.S)
-            {
                 DownArrow();
-            }
+            else if (e.KeyCode == Keys.Space)
+                Spacebar();
         }
 
         /// <summary>
@@ -89,7 +86,7 @@ namespace Tetris
         /// <summary>
         /// Redraw panel
         /// </summary>
-        private void panelTetrisBoard_Paint(object sender, PaintEventArgs e)
+        private void PanelTetrisBoard_Paint(object sender, PaintEventArgs e)
         {
             if (_board == null)
                 return;
