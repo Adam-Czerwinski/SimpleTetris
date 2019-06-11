@@ -1,0 +1,10 @@
+D:\Studia\Sem4\Prog.ob.i.graf\Kolokwium-Tetris\Kolokwium\Tetris\bin\Debug\Tetris.exe.config
+D:\Studia\Sem4\Prog.ob.i.graf\Kolokwium-Tetris\Kolokwium\Tetris\bin\Debug\Tetris.exe
+D:\Studia\Sem4\Prog.ob.i.graf\Kolokwium-Tetris\Kolokwium\Tetris\bin\Debug\Tetris.pdb
+D:\Studia\Sem4\Prog.ob.i.graf\Kolokwium-Tetris\Kolokwium\Tetris\obj\Debug\Tetris.Form.resources
+D:\Studia\Sem4\Prog.ob.i.graf\Kolokwium-Tetris\Kolokwium\Tetris\obj\Debug\Tetris.Properties.Resources.resources
+D:\Studia\Sem4\Prog.ob.i.graf\Kolokwium-Tetris\Kolokwium\Tetris\obj\Debug\Tetris.csproj.GenerateResource.cache
+D:\Studia\Sem4\Prog.ob.i.graf\Kolokwium-Tetris\Kolokwium\Tetris\obj\Debug\Tetris.csproj.CoreCompileInputs.cache
+D:\Studia\Sem4\Prog.ob.i.graf\Kolokwium-Tetris\Kolokwium\Tetris\obj\Debug\Tetris.exe
+D:\Studia\Sem4\Prog.ob.i.graf\Kolokwium-Tetris\Kolokwium\Tetris\obj\Debug\Tetris.pdb
+D:\Studia\Sem4\Prog.ob.i.graf\Kolokwium-Tetris\Kolokwium\Tetris\obj\Debug\Tetris.csprojAssemblyReference.cache
