@@ -66,13 +66,16 @@ namespace Tetris
         /// </summary>
         private void RunEngine()
         {
-            _view.VisibleStartButton = false;
-            _view.Score = "0";
+            //Ustaw, żeby przycisku nie było widać
+            _view.StartButtonVisibility(false);
+            //Ustaw wynik początkowy, czyli 0
+            _view.SetScore(0);
+
+            // L E C I M Y!!!!!
             _gameEngine.Run();
 
             //Dzięki temu nie trzeba czekać na wywołanie metody Update przez timer określonego interwału
             Update(null, null);
-
         }
 
         /// <summary>

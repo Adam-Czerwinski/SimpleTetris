@@ -6,8 +6,15 @@ namespace Tetris.Model
     public enum GameState { PLAYING, NOT_PLAYING }
     class GameEngine : IGameEngine
     {
+        /// <summary>
+        /// Akcja wywołująca kiedy zajdą zmiany w tablicy odzwierciedlającej logikę gry (TetrisBoard.Board)
+        /// </summary>
         public event Action Changes;
+        /// <summary>
+        /// Akcja wywołująca kiedy zajdą zmiany w wyniku gracza (Player.Score)
+        /// </summary>
         public event Action AddScore;
+
         public Player Player { get; set; }
         public TetrisBoard TetrisBoard { get; set; }
         public Tetromino[] Tetrominos { get; set; }
@@ -316,13 +323,10 @@ namespace Tetris.Model
         /// </summary>
         public void Run()
         {
-            //Timer ma możliwość aktywowania Elapsed event
-            Timer.Enabled = true;
+            //Timer wywołuję podpiętą metodą caly czas co interwał, a nie tylko raz (false)
             Timer.AutoReset = true;
-
-            //ustaw każdemu możliwemu tetromino jego pozycję początkową
-            foreach (Tetromino t in Tetrominos)
-                SetTetrominoPosition(t);
+            //Wystartuj Timer
+            Timer.Start();
 
             //Status - w trakcie gry
             State = GameState.PLAYING;
@@ -333,15 +337,9 @@ namespace Tetris.Model
         /// </summary>
         public void Stop()
         {
-            //Przestań wykonywać metodę co interwał
-            Timer.AutoReset = false; ;
-            Timer.Enabled = false;
             Timer.Stop();
 
             GameEngine.State = GameState.NOT_PLAYING;
-
-            //przygotuj następne tetromino w razie rozpoczęcia nowej gry
-            NewTetromino();
 
             //wyzeruj tablicę
             for (int i = 0; i < TetrisBoard.Board.GetLength(0); i++)

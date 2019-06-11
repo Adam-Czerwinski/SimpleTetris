@@ -13,8 +13,6 @@ namespace Tetris
             InitializeComponent();
         }
 
-        public string Score { get { return labelScoreActually.Text; } set { labelScoreActually.Text = value; } }
-        public bool VisibleStartButton { get { return buttonStartGame.Visible; } set { buttonStartGame.Visible = value; } }
         public event Action StartGame;
         public event Action LeftArrow;
         public event Action RightArrow;
@@ -24,7 +22,6 @@ namespace Tetris
         /// Tablica odzwierciedlająca grę
         /// </summary>
         private int[,] _board;
-
         public int[,] Board { set { _board = value; panelTetrisBoard.Invalidate(); } }
 
         /// <summary>
@@ -62,7 +59,7 @@ namespace Tetris
         {
             this.Invoke(new MethodInvoker(delegate ()
             {
-                VisibleStartButton = value;
+                buttonStartGame.Visible = value;
             }));
         }
 

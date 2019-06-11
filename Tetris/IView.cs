@@ -8,8 +8,6 @@ namespace Tetris
 {
     interface IView
     {
-        string Score { get; set; }
-        bool VisibleStartButton { get; set; }
         int[,] Board { set; }
         event Action StartGame;
         void SetScore(int score);
