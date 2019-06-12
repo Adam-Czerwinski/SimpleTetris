@@ -357,7 +357,8 @@ namespace Tetris.Model
                 }
             }
 
-            IncreaseScore(clearedLines);
+            if(clearedLines>0)
+                IncreaseScore(clearedLines);
         }
 
         /// <summary>
