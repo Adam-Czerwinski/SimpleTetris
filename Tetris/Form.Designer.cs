@@ -46,6 +46,10 @@ namespace Tetris
             this.panelTetrisBoard.Size = new System.Drawing.Size(320, 440);
             this.panelTetrisBoard.TabIndex = 0;
             this.panelTetrisBoard.Paint += new System.Windows.Forms.PaintEventHandler(this.PanelTetrisBoard_Paint);
+            //Usunięcie flickeringu
+            typeof(Panel).InvokeMember("DoubleBuffered",
+                BindingFlags.SetProperty | BindingFlags.Instance | BindingFlags.NonPublic,
+                null, panelTetrisBoard, new object[] { true });
             // 
             // buttonStartGame
             // 
@@ -59,11 +63,7 @@ namespace Tetris
             this.buttonStartGame.Text = "Start Game";
             this.buttonStartGame.UseVisualStyleBackColor = true;
             this.buttonStartGame.Click += new System.EventHandler(this.ButtonStartGame_Click);
-            
-            //Usunięcie flickeringu
-            typeof(Panel).InvokeMember("DoubleBuffered",
-                BindingFlags.SetProperty | BindingFlags.Instance | BindingFlags.NonPublic,
-                null, panelTetrisBoard, new object[] { true });
+
             // 
             // labelScore
             // 
@@ -97,11 +97,10 @@ namespace Tetris
             this.DoubleBuffered = true;
             this.KeyPreview = true;
             this.Name = "Form";
-            this.Text = "Tetris";
+            this.Text = "Simple Tetris";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form_KeyDown);
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         #endregion

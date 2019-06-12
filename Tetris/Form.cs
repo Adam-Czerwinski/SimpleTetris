@@ -88,6 +88,7 @@ namespace Tetris
         /// </summary>
         private void PanelTetrisBoard_Paint(object sender, PaintEventArgs e)
         {
+            panelTetrisBoard.SuspendLayout();
             if (_board == null)
                 return;
 
@@ -96,19 +97,19 @@ namespace Tetris
 
             #region Siatka
 
-            Pen penGrid = new Pen(Color.AliceBlue,0.3f);
+            Pen penGrid = new Pen(Color.AliceBlue, 0.3f);
             //Linie pionowe
-            int ileLinii = _board.GetLength(1);
-            for (int i = 1; i < ileLinii; i++)
+            int howManyLines = _board.GetLength(1);
+            for (int i = 1; i < howManyLines; i++)
             {
-                tableBoard.DrawLine(penGrid, i * Square.Width, 0 , i * Square.Width, _board.GetLength(0) * Square.Height);
+                tableBoard.DrawLine(penGrid, i * Square.Width, 0, i * Square.Width, _board.GetLength(0) * Square.Height);
             }
 
             //Linie poziome
-            ileLinii = _board.GetLength(0);
-            for (int i = 1; i < ileLinii; i++)
+            howManyLines = _board.GetLength(0);
+            for (int i = 1; i < howManyLines; i++)
             {
-                tableBoard.DrawLine(penGrid, 0, i*Square.Height, _board.GetLength(1) * Square.Width, i * Square.Width);
+                tableBoard.DrawLine(penGrid, 0, i * Square.Height, _board.GetLength(1) * Square.Width, i * Square.Width);
             }
             penGrid.Dispose();
             #endregion
@@ -157,23 +158,23 @@ namespace Tetris
                 {
                     if (_board[i, j] == 0)
                         continue;
-                    else
-                    {
-                        posX = j * Square.Width + 1;
-                        //Zmniejszamy o 4, żeby na początku ukryło cały prostokąt
-                        posY = (i - 4) * Square.Height + 1;
-                        rectangle = new Rectangle(posX, posY, Square.Width - 2, Square.Height - 2);
 
-                        //Wypełnienie kolorem
-                        brush = new SolidBrush(Color.FromArgb(_board[i, j]));
-                        //pen.Width = 2;
-                        tableBoard.FillRectangle(brush, rectangle);
-                        brush.Dispose();
-                    }
+                    posX = j * Square.Width + 1;
+                    //Zmniejszamy o 4, żeby na początku ukryło cały prostokąt
+                    posY = (i - 4) * Square.Height + 1;
+                    rectangle = new Rectangle(posX, posY, Square.Width - 2, Square.Height - 2);
+
+                    //Wypełnienie kolorem
+                    brush = new SolidBrush(Color.FromArgb(_board[i, j]));
+                    //pen.Width = 2;
+                    tableBoard.FillRectangle(brush, rectangle);
+                    brush.Dispose();
+
                 }
             }
 
             #endregion
+            panelTetrisBoard.ResumeLayout();
         }
     }
 }

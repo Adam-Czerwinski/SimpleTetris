@@ -45,8 +45,7 @@ namespace Tetris.Model
             //bo za każdym razem tetromino spada
             MoveDown();
 
-            //Wyczyść linie (o ile jest co)
-            ClearLines();
+           
         }
 
         /// <summary>
@@ -313,8 +312,13 @@ namespace Tetris.Model
             //Przypisz nowe pozycje tetromino
             Player.Tetromino.Position = newPosition;
 
+            //Zapisz nowe pozycje w tablicy
             foreach (int[] p in Player.Tetromino.Position)
                 TetrisBoard.Board[p[0], p[1]] = Player.Tetromino.Color.ToArgb();
+
+
+            //Wyczyść linie (o ile jest co)
+            ClearLines();
 
             Changes();
         }
@@ -353,7 +357,7 @@ namespace Tetris.Model
                         }
                     }
 
-                    i--;
+                    i++;
                 }
             }
 
@@ -367,7 +371,7 @@ namespace Tetris.Model
         /// <param name="clearedLines">Ilość wyczyszczonych linii za jednym razem</param>
         private void IncreaseScore(int clearedLines)
         {
-            Player.Score += Convert.ToInt32((clearedLines * 10) * 1.5);
+            Player.Score += Convert.ToInt32((clearedLines * 2)*10);
             AddScore();
         }
 
