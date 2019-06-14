@@ -8,6 +8,11 @@ namespace Tetris.Model
         I, T, O, L, J, S, Z
     }
 
+    public enum TetrominoRatationMode
+    {
+        First, Second, Third, Fourth
+    }
+
     class Tetromino
     {
         
@@ -15,6 +20,10 @@ namespace Tetris.Model
         /// Typ tetromino
         /// </summary>
         public TetrominoType Type { get; set; }
+        /// <summary>
+        /// Typ rotacji tetromino
+        /// </summary>
+        public TetrominoRatationMode Rotation { get; set; }
 
         /// <summary>
         /// Pozycja tetromino na tablicy tetrisBoard.
@@ -34,6 +43,7 @@ namespace Tetris.Model
         {
             Type = type;
             Color = color;
+            Rotation = TetrominoRatationMode.First;
 
             Position = new int[4][];
         }

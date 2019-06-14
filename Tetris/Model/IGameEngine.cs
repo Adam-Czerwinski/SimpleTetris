@@ -17,7 +17,9 @@ namespace Tetris.Model
         void MoveRight();
         void FallDown();
         void Run();
+        void unPause();
         void Stop();
         void Timer_Elapsed();
+        void RotateTetromino();
     }
 }

@@ -32,13 +32,13 @@ namespace Tetris
                 new Tetromino(TetrominoType.L, Color.Green),
                 new Tetromino(TetrominoType.J, Color.Blue),
                 new Tetromino(TetrominoType.S, Color.Brown),
-                new Tetromino(TetrominoType.Z, Color.Violet)
+                new Tetromino(TetrominoType.Z, Color.DarkCyan)
             };
 
             //utworzenie gracza
             Player player = new Player();
             //utworzenei silnika
-            GameEngine gameEngine = new GameEngine(tetrisBoard, player, tetrominos, 500);
+            IGameEngine gameEngine = new GameEngine(tetrisBoard, player, tetrominos, 500);
 
             //utworzenie widoku
             IView view = new Form();

@@ -14,10 +14,14 @@ namespace Tetris
         }
 
         public event Action StartGame;
+        public event Action UpArrow;
         public event Action LeftArrow;
         public event Action RightArrow;
         public event Action DownArrow;
         public event Action Spacebar;
+        //Wstrzymuje lub kontynuuje grę
+        public event Action unPause;
+
 
         /// <summary>
         /// Tablica odzwierciedlająca grę
@@ -44,8 +48,12 @@ namespace Tetris
                 RightArrow();
             else if (e.KeyCode == Keys.S)
                 DownArrow();
+            else if (e.KeyCode == Keys.W)
+                UpArrow();
             else if (e.KeyCode == Keys.Space)
                 Spacebar();
+            else if (e.KeyCode == Keys.P)
+                unPause();
         }
 
         /// <summary>
@@ -57,6 +65,17 @@ namespace Tetris
             this.Invoke(new MethodInvoker(delegate ()
             {
                 buttonStartGame.Visible = value;
+            }));
+        }
+
+        /// <summary>
+        /// Dostęp z innego wątku do widoczności labelu
+        /// </summary>
+        public void PausedLabelVisibility(bool value)
+        {
+            this.Invoke(new MethodInvoker(delegate ()
+            {
+                labelPaused.Visible = value;
             }));
         }
 

@@ -12,10 +12,13 @@ namespace Tetris
         event Action StartGame;
         void SetScore(int score);
         void StartButtonVisibility(bool value);
+        void PausedLabelVisibility(bool value);
         void ShowMessage(string msg);
+        event Action UpArrow;
         event Action LeftArrow;
         event Action RightArrow;
         event Action DownArrow;
         event Action Spacebar;
+        event Action unPause;
     }
 }

@@ -31,59 +31,69 @@ namespace Tetris
         /// </summary>
         private void InitializeComponent()
         {
-            this.panelTetrisBoard = new System.Windows.Forms.Panel();
-            //Mój przycisk którego nie da się zaznaczyć
-            this.buttonStartGame = new NonSelectableButton();
+            this.panelTetrisBoard = new Tetris.TetrisPanel();
             this.labelScore = new System.Windows.Forms.Label();
             this.labelScoreActually = new System.Windows.Forms.Label();
+            this.buttonStartGame = new Tetris.NonSelectableButton();
+            this.labelPaused = new System.Windows.Forms.Label();
+            this.panelTetrisBoard.SuspendLayout();
             this.SuspendLayout();
             // 
             // panelTetrisBoard
             // 
+            this.panelTetrisBoard.BackColor = System.Drawing.Color.Transparent;
             this.panelTetrisBoard.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelTetrisBoard.Controls.Add(this.labelPaused);
             this.panelTetrisBoard.Location = new System.Drawing.Point(12, 12);
             this.panelTetrisBoard.Name = "panelTetrisBoard";
             this.panelTetrisBoard.Size = new System.Drawing.Size(320, 440);
             this.panelTetrisBoard.TabIndex = 0;
             this.panelTetrisBoard.Paint += new System.Windows.Forms.PaintEventHandler(this.PanelTetrisBoard_Paint);
-            //Usunięcie flickeringu
-            typeof(Panel).InvokeMember("DoubleBuffered",
-                BindingFlags.SetProperty | BindingFlags.Instance | BindingFlags.NonPublic,
-                null, panelTetrisBoard, new object[] { true });
-            // 
-            // buttonStartGame
-            // 
-            this.buttonStartGame.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.buttonStartGame.Location = new System.Drawing.Point(480, 166);
-            this.buttonStartGame.Margin = new System.Windows.Forms.Padding(0);
-            this.buttonStartGame.Name = "buttonStartGame";
-            this.buttonStartGame.Size = new System.Drawing.Size(192, 68);
-            this.buttonStartGame.TabIndex = 1;
-            this.buttonStartGame.TabStop = false;
-            this.buttonStartGame.Text = "Start Game";
-            this.buttonStartGame.UseVisualStyleBackColor = true;
-            this.buttonStartGame.Click += new System.EventHandler(this.ButtonStartGame_Click);
-
             // 
             // labelScore
             // 
             this.labelScore.AutoSize = true;
-            this.labelScore.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.labelScore.Font = new System.Drawing.Font("MV Boli", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelScore.Location = new System.Drawing.Point(338, 12);
             this.labelScore.Name = "labelScore";
-            this.labelScore.Size = new System.Drawing.Size(109, 37);
+            this.labelScore.Size = new System.Drawing.Size(111, 41);
             this.labelScore.TabIndex = 2;
             this.labelScore.Text = "Score:";
             // 
             // labelScoreActually
             // 
             this.labelScoreActually.AutoSize = true;
-            this.labelScoreActually.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.labelScoreActually.Font = new System.Drawing.Font("MV Boli", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelScoreActually.Location = new System.Drawing.Point(453, 12);
             this.labelScoreActually.Name = "labelScoreActually";
-            this.labelScoreActually.Size = new System.Drawing.Size(35, 37);
+            this.labelScoreActually.Size = new System.Drawing.Size(40, 41);
             this.labelScoreActually.TabIndex = 3;
             this.labelScoreActually.Text = "0";
+            // 
+            // buttonStartGame
+            // 
+            this.buttonStartGame.Font = new System.Drawing.Font("MV Boli", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonStartGame.Location = new System.Drawing.Point(448, 166);
+            this.buttonStartGame.Margin = new System.Windows.Forms.Padding(0);
+            this.buttonStartGame.Name = "buttonStartGame";
+            this.buttonStartGame.Size = new System.Drawing.Size(224, 68);
+            this.buttonStartGame.TabIndex = 1;
+            this.buttonStartGame.TabStop = false;
+            this.buttonStartGame.Text = "Start Game";
+            this.buttonStartGame.UseVisualStyleBackColor = true;
+            this.buttonStartGame.Click += new System.EventHandler(this.ButtonStartGame_Click);
+            // 
+            // labelPaused
+            // 
+            this.labelPaused.BackColor = System.Drawing.Color.Transparent;
+            this.labelPaused.Font = new System.Drawing.Font("MV Boli", 36F);
+            this.labelPaused.Location = new System.Drawing.Point(3, 153);
+            this.labelPaused.Name = "labelPaused";
+            this.labelPaused.Size = new System.Drawing.Size(312, 68);
+            this.labelPaused.TabIndex = 0;
+            this.labelPaused.Text = "Paused";
+            this.labelPaused.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelPaused.Visible = false;
             // 
             // Form
             // 
@@ -99,16 +109,18 @@ namespace Tetris
             this.Name = "Form";
             this.Text = "Simple Tetris";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form_KeyDown);
+            this.panelTetrisBoard.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         #endregion
-
-        private System.Windows.Forms.Panel panelTetrisBoard;
-        private System.Windows.Forms.Button buttonStartGame;
         private System.Windows.Forms.Label labelScore;
         private System.Windows.Forms.Label labelScoreActually;
+        private NonSelectableButton buttonStartGame;
+        private TetrisPanel panelTetrisBoard;
+        private Label labelPaused;
     }
 }
 

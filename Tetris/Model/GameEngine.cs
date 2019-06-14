@@ -3,7 +3,7 @@ using System.Timers;
 
 namespace Tetris.Model
 {
-    public enum GameState { PLAYING, NOT_PLAYING }
+    public enum GameState { PLAYING, NOT_PLAYING, PAUSED }
     class GameEngine : IGameEngine
     {
         /// <summary>
@@ -18,9 +18,11 @@ namespace Tetris.Model
         public Player Player { get; set; }
         public TetrisBoard TetrisBoard { get; set; }
         public Tetromino[] Tetrominos { get; set; }
+
         public Timer Timer { get; set; }
         public static GameState State { get; set; } = GameState.NOT_PLAYING;
 
+        private int lastTypeOfTetromino = 0;
 
         public GameEngine(TetrisBoard tetrisBoard, Player player, Tetromino[] tetrominos, int interval)
         {
@@ -44,8 +46,6 @@ namespace Tetris.Model
         {
             //bo za każdym razem tetromino spada
             MoveDown();
-
-           
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Tetris.Model
         {
             //Zapobiega to rozpoczęciu gry w jakiś dziwny sposób
             //jeżeli nie jest w grze to nic nie rób
-            if (State == GameState.NOT_PLAYING)
+            if (State != GameState.PLAYING)
                 return;
 
             int[][] newPosition = new int[4][];
@@ -107,7 +107,7 @@ namespace Tetris.Model
         {
             //Zapobiega to rozpoczęciu gry w jakiś dziwny sposób
             //jeżeli nie jest w grze to nic nie rób
-            if (State == GameState.NOT_PLAYING)
+            if (State != GameState.PLAYING)
                 return;
 
             int[][] newPosition = new int[4][];
@@ -144,7 +144,7 @@ namespace Tetris.Model
             foreach (int[] np in newPosition)
             {
                 //jeżeli indeks nowej pozycji pokrywa się z długością pierwszego wymiaru (czyli wysokość) to wychodzi poza tablicę
-                if (np[0] == temporaryTetrisBoard.GetLength(0))
+                if (np[0] >= temporaryTetrisBoard.GetLength(0))
                 {
                     canChangePosition = false;
                     break;
@@ -178,7 +178,7 @@ namespace Tetris.Model
         {
             //Zapobiega to rozpoczęciu gry w jakiś dziwny sposób
             //jeżeli nie jest w grze to nic nie rób
-            if (State == GameState.NOT_PLAYING)
+            if (State != GameState.PLAYING)
                 return;
 
             int[][] newPosition = new int[4][];
@@ -211,7 +211,16 @@ namespace Tetris.Model
                 }
             }
 
-            //---------------SPRAWDZENIE CZY Z LEWEJ STRONY JEST JUŻ KLOCEK-------------------
+            canMoveLeft = CanMove(newPosition, canMoveLeft);
+
+            return canMoveLeft;
+        }
+
+        /// <summary>
+        /// Sprawdza czy tetromino może wejść w nową pozycję
+        /// </summary>
+        private bool CanMove(int[][] newPosition, bool canMoveThere)
+        {
             int[,] temporaryTetrisBoard = new int[TetrisBoard.Board.GetLength(0), TetrisBoard.Board.GetLength(1)];
             for (int i = 0; i < TetrisBoard.Board.GetLength(0); i++)
                 for (int j = 0; j < TetrisBoard.Board.GetLength(1); j++)
@@ -226,12 +235,12 @@ namespace Tetris.Model
                 //jeżeli wychodzy poza lewą krawędź
                 if (temporaryTetrisBoard[np[0], np[1]] != 0)
                 {
-                    canMoveLeft = false;
+                    canMoveThere = false;
                     break;
                 }
             }
 
-            return canMoveLeft;
+            return canMoveThere;
         }
 
         /// <summary>
@@ -241,7 +250,7 @@ namespace Tetris.Model
         {
             //Zapobiega to rozpoczęciu gry w jakiś dziwny sposób
             //jeżeli nie jest w grze to nic nie rób
-            if (State == GameState.NOT_PLAYING)
+            if (State != GameState.PLAYING)
                 return;
 
             int[][] newPosition = new int[4][];
@@ -276,25 +285,7 @@ namespace Tetris.Model
                 }
             }
 
-            //---------------SPRAWDZENIE CZY Z LEWEJ STRONY JEST JUŻ KLOCEK-------------------
-            int[,] temporaryTetrisBoard = new int[TetrisBoard.Board.GetLength(0), TetrisBoard.Board.GetLength(1)];
-            for (int i = 0; i < TetrisBoard.Board.GetLength(0); i++)
-                for (int j = 0; j < TetrisBoard.Board.GetLength(1); j++)
-                    temporaryTetrisBoard[i, j] = TetrisBoard.Board[i, j];
-
-            //Czyszczenie aktualnej pozycji w tymczasowej tablicy
-            foreach (int[] p in Player.Tetromino.Position)
-                temporaryTetrisBoard[p[0], p[1]] = 0;
-
-            foreach (int[] np in newPosition)
-            {
-                //jeżeli wychodzy poza lewą krawędź
-                if (temporaryTetrisBoard[np[0], np[1]] != 0)
-                {
-                    canMoveRight = false;
-                    break;
-                }
-            }
+            canMoveRight = CanMove(newPosition, canMoveRight);
 
             return canMoveRight;
         }
@@ -361,7 +352,7 @@ namespace Tetris.Model
                 }
             }
 
-            if(clearedLines>0)
+            if (clearedLines > 0)
                 IncreaseScore(clearedLines);
         }
 
@@ -371,7 +362,7 @@ namespace Tetris.Model
         /// <param name="clearedLines">Ilość wyczyszczonych linii za jednym razem</param>
         private void IncreaseScore(int clearedLines)
         {
-            Player.Score += Convert.ToInt32((clearedLines * 2)*10);
+            Player.Score += Convert.ToInt32((clearedLines * 2) * 10);
             AddScore();
         }
 
@@ -402,6 +393,26 @@ namespace Tetris.Model
             for (int i = 0; i < TetrisBoard.Board.GetLength(0); i++)
                 for (int j = 0; j < TetrisBoard.Board.GetLength(1); j++)
                     TetrisBoard.Board[i, j] = 0;
+        }
+
+        /// <summary>
+        /// Wstrzymuje lub kontynuuje silnik
+        /// </summary>
+        public void unPause()
+        {
+            if (State == GameState.NOT_PLAYING)
+                return;
+
+            if (State == GameState.PLAYING)
+            {
+                Timer.Stop();
+                State = GameState.PAUSED;
+            }
+            else
+            {
+                Timer.Start();
+                State = GameState.PLAYING;
+            }
         }
 
         /// <summary>
@@ -463,12 +474,259 @@ namespace Tetris.Model
         private void NewTetromino()
         {
             Random random = new Random();
-            int r = random.Next(0, Tetrominos.Length - 1);
+            int r = random.Next(0, Tetrominos.Length);
+
+            //Jeżeli powtórzy się tetromino to losuj od nowa
+            while (lastTypeOfTetromino == r)
+                r = random.Next(0, Tetrominos.Length);
+
+            lastTypeOfTetromino = r;
             Player.Tetromino = new Tetromino(Tetrominos[r].Type, Tetrominos[r].Color);
 
             //ustawienie pozycji początkowej Tetromino
             SetTetrominoPosition(Player.Tetromino);
         }
 
+        /// <summary>
+        /// Rotate tetromino
+        /// Based on: https://vignette.wikia.nocookie.net/tetrisconcept/images/3/3d/SRS-pieces.png/revision/latest?cb=20060626173148
+        /// </summary>
+        public void RotateTetromino()
+        {
+            //Zapobiega to rozpoczęciu gry w jakiś dziwny sposób
+            //jeżeli nie jest w grze to nic nie rób
+            if (State != GameState.PLAYING)
+                return;
+
+            int[][] newPosition = new int[4][];
+
+            switch (Player.Tetromino.Type)
+            {
+                case TetrominoType.I:
+                    switch (Player.Tetromino.Rotation)
+                    {
+                        //przejście z pierwszego trybu na drugi
+                        case TetrominoRatationMode.First:
+                            newPosition[0] = new int[] { Player.Tetromino.Position[0][0] + 1, Player.Tetromino.Position[0][1] + 1 };
+                            newPosition[1] = new int[] { Player.Tetromino.Position[1][0], Player.Tetromino.Position[1][1] };
+                            newPosition[2] = new int[] { Player.Tetromino.Position[2][0] - 1, Player.Tetromino.Position[2][1] - 1 };
+                            newPosition[3] = new int[] { Player.Tetromino.Position[3][0] - 2, Player.Tetromino.Position[3][1] - 2 };
+                            break;
+                        //przejście z drugiego typu na trzeci
+                        case TetrominoRatationMode.Second:
+                            newPosition[0] = new int[] { Player.Tetromino.Position[0][0] + 2, Player.Tetromino.Position[0][1] - 2 };
+                            newPosition[1] = new int[] { Player.Tetromino.Position[1][0] + 1, Player.Tetromino.Position[1][1] - 1 };
+                            newPosition[2] = new int[] { Player.Tetromino.Position[2][0], Player.Tetromino.Position[2][1] };
+                            newPosition[3] = new int[] { Player.Tetromino.Position[3][0] - 1, Player.Tetromino.Position[3][1] + 1 };
+                            break;
+                        //przejście z trzeciego typu na czwarty
+                        case TetrominoRatationMode.Third:
+                            newPosition[0] = new int[] { Player.Tetromino.Position[0][0] -1, Player.Tetromino.Position[0][1] - 1 };
+                            newPosition[1] = new int[] { Player.Tetromino.Position[1][0], Player.Tetromino.Position[1][1] };
+                            newPosition[2] = new int[] { Player.Tetromino.Position[2][0] + 1, Player.Tetromino.Position[2][1] + 1};
+                            newPosition[3] = new int[] { Player.Tetromino.Position[3][0] + 2, Player.Tetromino.Position[3][1] + 2 };
+                            break;
+                        //przejście z czwartego typu na pierwszy
+                        case TetrominoRatationMode.Fourth:
+                            newPosition[0] = new int[] { Player.Tetromino.Position[0][0] - 2, Player.Tetromino.Position[0][1] + 2 };
+                            newPosition[1] = new int[] { Player.Tetromino.Position[1][0] - 1, Player.Tetromino.Position[1][1] + 1 };
+                            newPosition[2] = new int[] { Player.Tetromino.Position[2][0], Player.Tetromino.Position[2][1] };
+                            newPosition[3] = new int[] { Player.Tetromino.Position[3][0] + 1, Player.Tetromino.Position[3][1] - 1 };
+                            break;
+                    }
+                    break;
+                case TetrominoType.J:
+                    switch (Player.Tetromino.Rotation)
+                    {
+                        case TetrominoRatationMode.First:
+                            newPosition[0] = new int[] { Player.Tetromino.Position[0][0] + 1, Player.Tetromino.Position[0][1] + 1};
+                            newPosition[1] = new int[] { Player.Tetromino.Position[1][0], Player.Tetromino.Position[1][1] };
+                            newPosition[2] = new int[] { Player.Tetromino.Position[2][0] - 1, Player.Tetromino.Position[2][1] - 1};
+                            newPosition[3] = new int[] { Player.Tetromino.Position[3][0] - 2, Player.Tetromino.Position[3][1] };
+                            break;
+                        case TetrominoRatationMode.Second:
+                            newPosition[0] = new int[] { Player.Tetromino.Position[0][0] + 1, Player.Tetromino.Position[0][1] - 1};
+                            newPosition[1] = new int[] { Player.Tetromino.Position[1][0], Player.Tetromino.Position[1][1] };
+                            newPosition[2] = new int[] { Player.Tetromino.Position[2][0] - 1, Player.Tetromino.Position[2][1] + 1};
+                            newPosition[3] = new int[] { Player.Tetromino.Position[3][0], Player.Tetromino.Position[3][1] + 2};
+                            break;
+                        case TetrominoRatationMode.Third:
+                            newPosition[0] = new int[] { Player.Tetromino.Position[0][0] - 1, Player.Tetromino.Position[0][1] - 1};
+                            newPosition[1] = new int[] { Player.Tetromino.Position[1][0], Player.Tetromino.Position[1][1]};
+                            newPosition[2] = new int[] { Player.Tetromino.Position[2][0] + 1, Player.Tetromino.Position[2][1] + 1};
+                            newPosition[3] = new int[] { Player.Tetromino.Position[3][0] + 2, Player.Tetromino.Position[3][1] };
+                            break;
+                        case TetrominoRatationMode.Fourth:
+                            newPosition[0] = new int[] { Player.Tetromino.Position[0][0] - 1, Player.Tetromino.Position[0][1] + 1};
+                            newPosition[1] = new int[] { Player.Tetromino.Position[1][0], Player.Tetromino.Position[1][1] };
+                            newPosition[2] = new int[] { Player.Tetromino.Position[2][0] + 1, Player.Tetromino.Position[2][1] - 1};
+                            newPosition[3] = new int[] { Player.Tetromino.Position[3][0], Player.Tetromino.Position[3][1] - 2};
+                            break;
+                    }
+                    break;
+                case TetrominoType.L:
+                    switch (Player.Tetromino.Rotation)
+                    {
+                        case TetrominoRatationMode.First:
+                            newPosition[0] = new int[] { Player.Tetromino.Position[0][0] + 1, Player.Tetromino.Position[0][1] + 1};
+                            newPosition[1] = new int[] { Player.Tetromino.Position[1][0], Player.Tetromino.Position[1][1] };
+                            newPosition[2] = new int[] { Player.Tetromino.Position[2][0] - 1, Player.Tetromino.Position[2][1] - 1};
+                            newPosition[3] = new int[] { Player.Tetromino.Position[3][0], Player.Tetromino.Position[3][1] - 2};
+                            break;
+                        case TetrominoRatationMode.Second:
+                            newPosition[0] = new int[] { Player.Tetromino.Position[0][0] + 1, Player.Tetromino.Position[0][1] - 1};
+                            newPosition[1] = new int[] { Player.Tetromino.Position[1][0], Player.Tetromino.Position[1][1] };
+                            newPosition[2] = new int[] { Player.Tetromino.Position[2][0] - 1, Player.Tetromino.Position[2][1] + 1};
+                            newPosition[3] = new int[] { Player.Tetromino.Position[3][0] - 2, Player.Tetromino.Position[3][1] };
+                            break;
+                        case TetrominoRatationMode.Third:
+                            newPosition[0] = new int[] { Player.Tetromino.Position[0][0] - 1, Player.Tetromino.Position[0][1] - 1};
+                            newPosition[1] = new int[] { Player.Tetromino.Position[1][0], Player.Tetromino.Position[1][1]};
+                            newPosition[2] = new int[] { Player.Tetromino.Position[2][0] + 1, Player.Tetromino.Position[2][1] + 1};
+                            newPosition[3] = new int[] { Player.Tetromino.Position[3][0], Player.Tetromino.Position[3][1] + 2};
+                            break;
+                        case TetrominoRatationMode.Fourth:
+                            newPosition[0] = new int[] { Player.Tetromino.Position[0][0] - 1, Player.Tetromino.Position[0][1] + 1};
+                            newPosition[1] = new int[] { Player.Tetromino.Position[1][0], Player.Tetromino.Position[1][1] };
+                            newPosition[2] = new int[] { Player.Tetromino.Position[2][0] + 1, Player.Tetromino.Position[2][1] - 1};
+                            newPosition[3] = new int[] { Player.Tetromino.Position[3][0] + 2, Player.Tetromino.Position[3][1] };
+                            break;
+                    }
+                    break;
+                case TetrominoType.S:
+                    switch (Player.Tetromino.Rotation)
+                    {
+                        case TetrominoRatationMode.First:
+                            newPosition[0] = new int[] { Player.Tetromino.Position[0][0] - 2, Player.Tetromino.Position[0][1] };
+                            newPosition[1] = new int[] { Player.Tetromino.Position[1][0] - 1, Player.Tetromino.Position[1][1] - 1};
+                            newPosition[2] = new int[] { Player.Tetromino.Position[2][0], Player.Tetromino.Position[2][1] };
+                            newPosition[3] = new int[] { Player.Tetromino.Position[3][0] + 1, Player.Tetromino.Position[3][1] - 1};
+                            break;
+                        case TetrominoRatationMode.Second:
+                            newPosition[0] = new int[] { Player.Tetromino.Position[0][0], Player.Tetromino.Position[0][1] + 2};
+                            newPosition[1] = new int[] { Player.Tetromino.Position[1][0] - 1, Player.Tetromino.Position[1][1] + 1};
+                            newPosition[2] = new int[] { Player.Tetromino.Position[2][0], Player.Tetromino.Position[2][1] };
+                            newPosition[3] = new int[] { Player.Tetromino.Position[3][0] - 1, Player.Tetromino.Position[3][1] - 1 };
+                            break;
+                        case TetrominoRatationMode.Third:
+                            newPosition[0] = new int[] { Player.Tetromino.Position[0][0] + 2, Player.Tetromino.Position[0][1] };
+                            newPosition[1] = new int[] { Player.Tetromino.Position[1][0] + 1, Player.Tetromino.Position[1][1] + 1};
+                            newPosition[2] = new int[] { Player.Tetromino.Position[2][0], Player.Tetromino.Position[2][1] };
+                            newPosition[3] = new int[] { Player.Tetromino.Position[3][0] - 1, Player.Tetromino.Position[3][1] + 1};
+                            break;
+                        case TetrominoRatationMode.Fourth:
+                            newPosition[0] = new int[] { Player.Tetromino.Position[0][0], Player.Tetromino.Position[0][1] - 2};
+                            newPosition[1] = new int[] { Player.Tetromino.Position[1][0] + 1, Player.Tetromino.Position[1][1] - 1};
+                            newPosition[2] = new int[] { Player.Tetromino.Position[2][0], Player.Tetromino.Position[2][1] };
+                            newPosition[3] = new int[] { Player.Tetromino.Position[3][0] + 1, Player.Tetromino.Position[3][1] + 1};
+                            break;
+                    }
+                    break;
+                case TetrominoType.T:
+                    switch (Player.Tetromino.Rotation)
+                    {
+                        case TetrominoRatationMode.First:
+                            newPosition[0] = new int[] { Player.Tetromino.Position[0][0] - 1, Player.Tetromino.Position[0][1] + 1};
+                            newPosition[1] = new int[] { Player.Tetromino.Position[1][0], Player.Tetromino.Position[1][1] };
+                            newPosition[2] = new int[] { Player.Tetromino.Position[2][0] + 1, Player.Tetromino.Position[2][1] - 1};
+                            newPosition[3] = new int[] { Player.Tetromino.Position[3][0] - 1, Player.Tetromino.Position[3][1] - 1};
+                            break;
+                        case TetrominoRatationMode.Second:
+                            newPosition[0] = new int[] { Player.Tetromino.Position[0][0] + 1, Player.Tetromino.Position[0][1] + 1};
+                            newPosition[1] = new int[] { Player.Tetromino.Position[1][0], Player.Tetromino.Position[1][1] };
+                            newPosition[2] = new int[] { Player.Tetromino.Position[2][0] - 1, Player.Tetromino.Position[2][1] - 1};
+                            newPosition[3] = new int[] { Player.Tetromino.Position[3][0] - 1, Player.Tetromino.Position[3][1]  + 1};
+                            break;
+                        case TetrominoRatationMode.Third:
+                            newPosition[0] = new int[] { Player.Tetromino.Position[0][0] + 1, Player.Tetromino.Position[0][1] - 1};
+                            newPosition[1] = new int[] { Player.Tetromino.Position[1][0], Player.Tetromino.Position[1][1] };
+                            newPosition[2] = new int[] { Player.Tetromino.Position[2][0] - 1, Player.Tetromino.Position[2][1] + 1};
+                            newPosition[3] = new int[] { Player.Tetromino.Position[3][0] + 1, Player.Tetromino.Position[3][1] + 1};
+                            break;
+                        case TetrominoRatationMode.Fourth:
+                            newPosition[0] = new int[] { Player.Tetromino.Position[0][0] - 1, Player.Tetromino.Position[0][1] - 1};
+                            newPosition[1] = new int[] { Player.Tetromino.Position[1][0], Player.Tetromino.Position[1][1] };
+                            newPosition[2] = new int[] { Player.Tetromino.Position[2][0] + 1, Player.Tetromino.Position[2][1] + 1};
+                            newPosition[3] = new int[] { Player.Tetromino.Position[3][0] + 1, Player.Tetromino.Position[3][1] - 1};
+                            break;
+                    }
+                    break;
+                case TetrominoType.Z:
+                    switch (Player.Tetromino.Rotation)
+                    {
+                        case TetrominoRatationMode.First:
+                            newPosition[0] = new int[] { Player.Tetromino.Position[0][0] - 1, Player.Tetromino.Position[0][1] + 1};
+                            newPosition[1] = new int[] { Player.Tetromino.Position[1][0], Player.Tetromino.Position[1][1] };
+                            newPosition[2] = new int[] { Player.Tetromino.Position[2][0] - 1, Player.Tetromino.Position[2][1] - 1};
+                            newPosition[3] = new int[] { Player.Tetromino.Position[3][0], Player.Tetromino.Position[3][1] - 2};
+                            break;
+                        case TetrominoRatationMode.Second:
+                            newPosition[0] = new int[] { Player.Tetromino.Position[0][0] + 1, Player.Tetromino.Position[0][1] + 1};
+                            newPosition[1] = new int[] { Player.Tetromino.Position[1][0], Player.Tetromino.Position[1][1] };
+                            newPosition[2] = new int[] { Player.Tetromino.Position[2][0] - 1, Player.Tetromino.Position[2][1] + 1};
+                            newPosition[3] = new int[] { Player.Tetromino.Position[3][0] - 2, Player.Tetromino.Position[3][1] };
+                            break;
+                        case TetrominoRatationMode.Third:
+                            newPosition[0] = new int[] { Player.Tetromino.Position[0][0] + 1, Player.Tetromino.Position[0][1] - 1};
+                            newPosition[1] = new int[] { Player.Tetromino.Position[1][0], Player.Tetromino.Position[1][1] };
+                            newPosition[2] = new int[] { Player.Tetromino.Position[2][0] + 1, Player.Tetromino.Position[2][1] + 1};
+                            newPosition[3] = new int[] { Player.Tetromino.Position[3][0], Player.Tetromino.Position[3][1] + 2};
+                            break;
+                        case TetrominoRatationMode.Fourth:
+                            newPosition[0] = new int[] { Player.Tetromino.Position[0][0] - 1, Player.Tetromino.Position[0][1] - 1};
+                            newPosition[1] = new int[] { Player.Tetromino.Position[1][0], Player.Tetromino.Position[1][1] };
+                            newPosition[2] = new int[] { Player.Tetromino.Position[2][0] + 1, Player.Tetromino.Position[2][1] - 1};
+                            newPosition[3] = new int[] { Player.Tetromino.Position[3][0] + 2, Player.Tetromino.Position[3][1] };
+                            break;
+                    }
+                    break;
+            }
+
+
+            if (newPosition[0] != null && CanRotate(newPosition))
+            {
+                UpdateTetrisBoard(newPosition);
+                switch (Player.Tetromino.Rotation)
+                {
+                    case TetrominoRatationMode.First:
+                        Player.Tetromino.Rotation = TetrominoRatationMode.Second;
+                        break;
+                    case TetrominoRatationMode.Second:
+                        Player.Tetromino.Rotation = TetrominoRatationMode.Third;
+                        break;
+                    case TetrominoRatationMode.Third:
+                        Player.Tetromino.Rotation = TetrominoRatationMode.Fourth;
+                        break;
+                    case TetrominoRatationMode.Fourth:
+                        Player.Tetromino.Rotation = TetrominoRatationMode.First;
+                        break;
+
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sprawdza czy może zrobić rotację tetromino
+        /// </summary>
+        private bool CanRotate(int[][] newPosition)
+        {
+            bool canRotate = true;
+
+            //---------------SPRAWDZENIE KRAWĘDZI-------------------
+            foreach (int[] np in newPosition)
+            {
+                //jeżeli wychodzi poza krawędzie
+                if (np[0] < 0 || np[1] >= TetrisBoard.Board.GetLength(1) || np[1] <= 0)
+                {
+                    canRotate = false;
+                    return canRotate;
+                }
+            }
+
+            //---------------SPRAWDZENIE CZY JEST JUŻ KLOCEK-------------------
+            canRotate = CanMove(newPosition, canRotate);
+
+            return canRotate;
+        }
     }
 }
